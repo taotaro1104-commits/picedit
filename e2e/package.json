@@ -1,0 +1,12 @@
+{
+  "name": "picedit-e2e",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "fixtures": "uv run --project ../api python fixtures/make_fixtures.py",
+    "test": "playwright test"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.63.0"
+  }
+}

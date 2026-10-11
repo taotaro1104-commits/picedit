@@ -1,0 +1,112 @@
+# ==========================================================================
+# picedit — mixhost（LiteSpeed / Apache 互換）用 .htaccess
+# public_html 直下に置く。/api は cPanel の「Python アプリケーション」が処理する。
+# ==========================================================================
+
+Options -Indexes -MultiViews
+DirectoryIndex index.html
+ErrorDocument 404 /404.html
+AddDefaultCharset utf-8
+
+# ── MIME タイプ ──
+<IfModule mod_mime.c>
+  AddType application/wasm .wasm
+  AddType text/javascript .js .mjs
+  AddType image/svg+xml .svg
+  AddType application/xml .xml
+  AddCharset utf-8 .html .css .js .mjs .xml .txt .json
+</IfModule>
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # 1) HTTPS に統一（プロキシ経由でも判定できるようにする）
+  RewriteCond %{HTTPS} !=on
+  RewriteCond %{HTTP:X-Forwarded-Proto} !https
+  RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+  # 2) www なしに統一（www ありに統一したい場合はこのブロックを書き換える）
+  RewriteCond %{HTTP_HOST} ^www\.(.+)$ [NC]
+  RewriteRule ^ https://%1%{REQUEST_URI} [R=301,L]
+
+  # 3) API（Python アプリ）と Let's Encrypt の認証ファイルには以降のルールを適用しない
+  RewriteRule ^api(/|$) - [L]
+  RewriteRule ^\.well-known/ - [L]
+
+  # 4) ドットファイル（.git / .env など）へのアクセスを拒否
+  RewriteRule (^|/)\.(?!well-known/) - [F,L]
+
+  # 5) index.html 付きの URL は正規 URL（末尾スラッシュ）へ
+  RewriteCond %{THE_REQUEST} \s/+(.*/)?index\.html[\s?] [NC]
+  RewriteRule ^(.*/)?index\.html$ /%1 [R=301,L,NE]
+
+  # 6) ディレクトリ URL の末尾スラッシュを補う（/ja/real-estate → /ja/real-estate/）
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{DOCUMENT_ROOT}/$1/index.html -f
+  RewriteRule ^(.+[^/])$ /$1/ [R=301,L]
+
+  # 7) トップ "/" はブラウザの言語で振り分ける（検索エンジン向けには hreflang の x-default）
+  RewriteCond %{HTTP:Accept-Language} ^zh-(tw|hk|mo|hant) [NC]
+  RewriteRule ^$ /zh-TW/ [R=302,L]
+  RewriteCond %{HTTP:Accept-Language} ^zh [NC]
+  RewriteRule ^$ /zh-CN/ [R=302,L]
+  RewriteCond %{HTTP:Accept-Language} ^ko [NC]
+  RewriteRule ^$ /ko/ [R=302,L]
+  RewriteCond %{HTTP:Accept-Language} ^en [NC]
+  RewriteRule ^$ /en/ [R=302,L]
+  RewriteRule ^$ /ja/ [R=302,L]
+
+  # 8) バックアップ、設定、ソースマップなどのファイルは公開しない
+  RewriteRule (^|/)(?:[^/]+\.)?(?:bak|old|orig|swp|sql|sqlite3?|db|log|ini|conf|ya?ml|toml|lock|map|zip|tar|gz|7z|pem|key|crt|p12|php|py|sh)$ - [F,L,NC]
+
+  # 9) 公開するのは生成済みページ、静的アセット、認証用ファイルに限定する
+  RewriteCond %{REQUEST_URI} !^/(?:\.well-known|api|assets|ja|en|zh-CN|zh-TW|ko)(?:/|$) [NC]
+  RewriteCond %{REQUEST_URI} !^/(?:index\.html|404\.html|robots\.txt|sitemap\.xml|indexnow-key\.txt|ads\.txt|favicon\.svg|apple-touch-icon\.png|og-image\.png)$ [NC]
+  RewriteRule ^ - [F,L]
+</IfModule>
+
+# ── セキュリティヘッダー ──
+<IfModule mod_headers.c>
+  # HTTPS での表示を確認してから有効にすること（有効化後は1年間 HTTP に戻せない）
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains"
+  Header always set X-Content-Type-Options "nosniff"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header always set Referrer-Policy "strict-origin-when-cross-origin"
+  Header always set Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+  # CSP は AdSense / アナリティクスが多数のドメインを使うため設定していない（入れる場合は Report-Only で検証してから）
+  Header unset X-Powered-By
+
+  # トップの言語振り分けはキャッシュを言語ごとに分ける
+  <If "%{REQUEST_URI} == '/'">
+    Header append Vary "Accept-Language"
+  </If>
+</IfModule>
+
+# ── キャッシュ ──
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 hour"
+  ExpiresByType text/html "access plus 0 seconds"
+  ExpiresByType application/xml "access plus 1 day"
+  ExpiresByType text/plain "access plus 1 day"
+  ExpiresByType image/png "access plus 30 days"
+  ExpiresByType image/svg+xml "access plus 30 days"
+</IfModule>
+
+<IfModule mod_headers.c>
+  # ビルド時にファイル名へハッシュが付くアセットは1年キャッシュ（内容が変わればURLも変わる）
+  <FilesMatch "^.+-[A-Za-z0-9_-]{8}\.(js|css|wasm)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  # HTML は毎回再検証して、デプロイ後すぐに新しい版が表示されるようにする
+  <FilesMatch "\.html$">
+    Header set Cache-Control "no-cache"
+  </FilesMatch>
+</IfModule>
+
+# ── 圧縮（LiteSpeed は Brotli/gzip を自動で行うが、Apache 互換のため指定） ──
+<IfModule mod_deflate.c>
+  AddOutputFilterByType DEFLATE text/html text/css text/plain text/xml application/xml
+  AddOutputFilterByType DEFLATE text/javascript application/javascript application/json
+  AddOutputFilterByType DEFLATE image/svg+xml application/wasm
+</IfModule>

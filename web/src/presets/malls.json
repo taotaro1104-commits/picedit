@@ -1,0 +1,46 @@
+{
+  "checkedAt": "2026-09-27",
+  "presets": [
+    {
+      "id": "amazon",
+      "width": 2000,
+      "height": 2000,
+      "fillRatio": 0.88,
+      "background": "#FFFFFF",
+      "backgroundLocked": true,
+      "format": "jpeg",
+      "quality": 0.92
+    },
+    {
+      "id": "rakuten",
+      "width": 1200,
+      "height": 1200,
+      "fillRatio": 0.8,
+      "background": "#FFFFFF",
+      "backgroundLocked": false,
+      "format": "jpeg",
+      "quality": 0.9
+    },
+    {
+      "id": "yahoo",
+      "width": 1200,
+      "height": 1200,
+      "fillRatio": 0.8,
+      "background": "#FFFFFF",
+      "backgroundLocked": false,
+      "format": "jpeg",
+      "quality": 0.9
+    },
+    {
+      "id": "mercari",
+      "width": 1080,
+      "height": 1080,
+      "fillRatio": 0.8,
+      "background": "#FFFFFF",
+      "backgroundLocked": false,
+      "format": "jpeg",
+      "quality": 0.9
+    }
+  ],
+  "_comment": "表示名と注意書きは src/i18n/messages/*.ts の presets にある（多言語化のため）"
+}

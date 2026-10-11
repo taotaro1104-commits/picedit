@@ -1,0 +1,144 @@
+:root {
+  --bg: #f6f5f2;
+  --surface: #ffffff;
+  --text: #2a2723;
+  --muted: #6f6a63;
+  --border: #e2ded7;
+  --accent: #1f6f5c;
+  --accent-ink: #ffffff;
+  --accent-soft: #e3f0ec;
+  --danger: #b3261e;
+  --danger-soft: #fbe9e7;
+  --notice-soft: #fff6dd;
+  --checker: #e9e6e0;
+  --radius: 10px;
+  --page-max: 1360px;
+  --header-h: 60px;
+  --shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  --sans: 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', system-ui, sans-serif;
+
+  font: 15px/1.6 var(--sans);
+  color: var(--text);
+  background: var(--bg);
+  color-scheme: light;
+  -webkit-font-smoothing: antialiased;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17181a;
+    --surface: #222326;
+    --text: #ecebe8;
+    --muted: #a19d96;
+    --border: #36383c;
+    --accent: #5fbfa5;
+    --accent-ink: #0d1f1a;
+    --accent-soft: #1d3530;
+    --danger: #ff8a80;
+    --danger-soft: #3a1f1d;
+    --notice-soft: #3a3320;
+    --checker: #2c2d30;
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-padding-top: calc(var(--header-h) + 12px);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+a {
+  color: var(--accent);
+}
+
+img {
+  max-width: 100%;
+}
+
+button {
+  font: inherit;
+  color: var(--text);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+button[aria-pressed='true'],
+button[aria-selected='true'] {
+  background: var(--accent-soft);
+  border-color: var(--accent);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+input[type='range'] {
+  width: 100%;
+  accent-color: var(--accent);
+}
+
+select {
+  font: inherit;
+  padding: 6px 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text);
+}
+
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* iOS で入力欄にフォーカスした時の自動ズームを防ぐ（16px 未満だと拡大される） */
+@media (max-width: 767px) {
+  select,
+  input:not([type='range']):not([type='checkbox']):not([type='color']) {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

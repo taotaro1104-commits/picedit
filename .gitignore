@@ -1,0 +1,27 @@
+# Python
+api/.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node
+node_modules/
+web/dist/
+web/dist-ssr/
+deploy/
+web/coverage/
+*.tsbuildinfo
+
+# E2E
+e2e/test-results/
+e2e/playwright-report/
+
+# Secrets
+.env
+!.env.example
+
+# 公開しない内部資料
+docs/seo-strategy.md

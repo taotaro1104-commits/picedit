@@ -1,0 +1,39 @@
+[project]
+name = "picedit-api"
+version = "0.1.0"
+description = "picedit image processing API"
+requires-python = ">=3.11"
+dependencies = [
+    "a2wsgi>=1.10.10",
+    "fastapi>=0.141.1",
+    "httpx>=0.28.1",
+    "numpy>=2.4.6",
+    "opencv-python-headless>=4.10,<5",
+    "pillow>=12.3.0",
+    "pillow-heif>=1.8.0",
+    "pydantic-settings>=2.15.0",
+    "python-multipart>=0.0.32",
+    "uvicorn[standard]>=0.54.0",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.1.1",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.16.9",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+addopts = "-q"
+
+[tool.coverage.run]
+source = ["app"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "B", "UP", "SIM"]
