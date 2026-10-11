@@ -83,7 +83,7 @@ SITE_URL=https://あなたのドメイン bash scripts/build-mixhost.sh
 
 - **SSL**：cPanel の「SSL/TLS Status」で無料 SSL を有効化。HTTPS での表示を確認するまで `.htaccess` の `Strict-Transport-Security` 行はコメントアウトしておくと安全です。
 - **Google Search Console**：ドメインを登録し、`sitemap.xml` を送信。
-- **AdSense**：サイトを追加して審査を申請（`ads.txt` は配置済み）。EEA・英国の利用者向けに、AdSense 管理画面の「プライバシーとメッセージ」で Google 認定の同意管理（CMP）を有効にしてください。
+- **AdSense**：サイトを追加して審査を申請（`ads.txt` は手元の `web/ads.txt.local` から `scripts/build-mixhost.sh` が配置します。雛形は `web/ads.txt.example`）。EEA・英国の利用者向けに、AdSense 管理画面の「プライバシーとメッセージ」で Google 認定の同意管理（CMP）を有効にしてください。
 - **アナリティクス**：GA4 のプロパティで「拡張計測機能 → ページビュー（ブラウザの履歴イベントに基づくページの変更）」が有効なことを確認（ページ切り替えも計測されます）。
 
 ## API を別サーバーに置く場合
